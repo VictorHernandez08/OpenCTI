@@ -27,4 +27,6 @@ https://www.sentinelone.com/ (paga)
 https://www.silobreaker.com/ (paga) 
 https://tdm.socprime.com/ (Se crea cuenta gratis pero para APi tiene un costo)
 https://www.nextron-systems.com/ (paga) 
-https://www.zerofox.com/ (paga
+https://www.zerofox.com/ (paga)
+
+
