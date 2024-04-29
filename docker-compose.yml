@@ -141,7 +141,7 @@ services:
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=${CONNECTOR_IMPORT_FILE_STIX_ID} # Valid UUIDv4
+      - CONNECTOR_ID=2c5d0122-c9a5-444d-98ae-21ceeb62efc6 # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_IMPORT_FILE
       - CONNECTOR_NAME=ImportFileStix
       - CONNECTOR_VALIDATE_BEFORE_IMPORT=true # Validate any bundle before import
@@ -150,6 +150,43 @@ services:
       - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=info
     restart: always
+    depends_on:
+      - opencti
+
+  connector-ivre:
+    image: opencti/connector-ivre:6.0.10
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=2f3c583b-81fb-4cfc-8b42-da4f25491315
+      - CONNECTOR_NAME=ivre
+      - CONNECTOR_SCOPE=autonomous-system,domain-name,ipv4-addr,ipv6-addr,mac-addr,x509-certificate
+      - CONNECTOR_AUTO=true
+      - CONNECTOR_CONFIDENCE_LEVEL=100 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+      - IVRE_MAX_TLP=TLP:AMBER
+    restart: always
+    depends_on:
+      - opencti
+
+  connector-ipqs:
+    image: opencti/connector-ipqs:6.0.10  #El API es proporcionado en el correo 
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=a3355555-01ec-4774-b1eb-ac63c42263e6
+      - CONNECTOR_NAME=IPQS Fraud and Risk Scoring
+      - CONNECTOR_SCOPE=Domain-Name,IPv4-Addr,Email-Addr,Url,Phone-Number
+      - CONNECTOR_AUTO=true
+      - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+      - IPQS_PRIVATE_KEY=U0OmVDyza43tkuhFVGEI2BFPQSL2Afvr
+      - IPQS_BASE_URL=https://ipqualityscore.com/api/json
+      # IP specific config settings
+      - IPQS_IP_ADD_RELATIONSHIPS=true # Whether or not to add ASN relationships
+      # Domain specific config settings
+      - IPQS_DOMAIN_ADD_RELATIONSHIPS=true # Whether or not to add IP resolution relationships
+    restart: always    
     depends_on:
       - opencti
   connector-import-document:
@@ -181,7 +218,7 @@ services:
       - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=error
       - ALIENVAULT_BASE_URL=https://otx.alienvault.com
-      - ALIENVAULT_API_KEY=----------------------------------------------------
+      - ALIENVAULT_API_KEY=175772fa96b9aa6082080ef1d31852e6ca5078399db144bd470053bbd55cf814
       - ALIENVAULT_TLP=White
       - ALIENVAULT_CREATE_OBSERVABLES=true
       - ALIENVAULT_CREATE_INDICATORS=true
@@ -200,7 +237,7 @@ services:
   connector-mitre:
     image: opencti/connector-mitre:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost:8080:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=49bea969-1881-4965-95fa-82106c76a1c5
       - "CONNECTOR_NAME=MITRE Datasets"
@@ -240,7 +277,7 @@ services:
       - CONNECTOR_CONFIDENCE_LEVEL=80 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=error
       - ABUSEIPDB_URL=https://api.abuseipdb.com/api/v2/blacklist
-      - ABUSEIPDB_API_KEY=ChangeMe
+      - ABUSEIPDB_API_KEY=3029f20795cd524b4d646ebbd484bff8471c220a741f3c82296fcaebca4a4ef38bd18ba3810aee18
       - ABUSEIPDB_SCORE=100
       - ABUSEIPDB_LIMIT=10000
       - ABUSEIPDB_INTERVAL=2 #Day
@@ -264,7 +301,7 @@ services:
     depends_on:
       - opencti  
   connector-cape:
-    image: opencti/connector-cape:6.0.10  #revisar Apis
+    image: opencti/connector-cape:6.0.10   #Revisar sitio ya que no tiene servicio 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -287,7 +324,7 @@ services:
   connector-chapsvision:
     image: opencti/connector-chapsvision:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=1102e743-15e2-424b-9ce2-9074f32cbd45
       - CONNECTOR_NAME=Chapsvision
@@ -306,7 +343,7 @@ services:
   connector-cisa-known-exploited-vulnerabilities:
     image: opencti/connector-cisa-known-exploited-vulnerabilities:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=a98843b4-f264-49ab-80a7-e596d9c826c5
       - "CONNECTOR_NAME=CISA Known Exploited Vulnerabilities"
@@ -319,11 +356,12 @@ services:
       - CISA_INTERVAL=2 # In days, must be strictly greater than 1
     restart: always 
     depends_on:
-      - opencti    
+      - opencti  
+        #Conector de Paga
   connector-citalid:
     image: opencti/connector-citalid:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=8a8387ae-6ffe-45f7-98e8-61f7b13de9c1
       - CONNECTOR_NAME=Citalid
@@ -342,7 +380,7 @@ services:
     image: opencti/connector-cluster25:6.0.10
     build: .
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=ec16d7fc-37a0-48f8-ad09-ac5bd039a6c6
       - CONNECTOR_NAME=Cluster25
@@ -356,9 +394,9 @@ services:
     depends_on:
       - opencti
   connector-comlaude:
-    image: opencti/connector-comlaude:6.0.10
+    image: opencti/connector-comlaude:6.0.10   #Conector de paga
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=8988d780-44d2-4abf-ac90-663d8cbf06da
       - CONNECTOR_NAME="Comlaude"
@@ -378,9 +416,9 @@ services:
     depends_on:
       - opencti
   connector-cpe:
-    image: opencti/connector-cpe:6.0.10
+    image: opencti/connector-cpe:6.0.10 #accesos en espera 
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=c903ac2d-b08f-4a9a-a2fb-45ddd74dec9e
       - CONNECTOR_TYPE=EXTERNAL_IMPORT
@@ -389,21 +427,21 @@ services:
       - CONNECTOR_CONFIDENCE_LEVEL=75 # From 0 (Unknown) to 100 (Fully trusted).
       - CONNECTOR_LOG_LEVEL=info
       - CPE_BASE_URL=https://services.nvd.nist.gov/rest/json/cpes/2.0
-      - NIST_API_KEY=ChangeMe # Required
+      - NIST_API_KEY=76b87db0-91b0-44aa-a241-3c8ac6f8b113 # Required
       - CPE_INTERVAL=6h # Required, in hours advice min 6
     restart: always         
     depends_on:
       - opencti
   connector-crits:
-    image: opencti/connector-crits:6.0.10
+    image: opencti/connector-crits:6.0.10 #revisar configuracion
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=e16965ce-64f3-4002-8d8c-2198e728bffd
       - CONNECTOR_NAME=CRITs
       - CONNECTOR_SCOPE=crits
       - CONNECTOR_LOG_LEVEL=error
-      - CRITS_URL=http://localhost:8080
+      - CRITS_URL=http://opencti:8080
       - CRITS_REFERENCE_URL= # Optional, used to create references to CRITs entities, defaults to URL
       - CRITS_USER=ChangeMe
       - CRITS_API_KEY=ChangeMe
@@ -418,9 +456,9 @@ services:
     depends_on:
       - opencti
   connector-crowdstrike:
-    image: opencti/connector-crowdstrike:6.0.10
+    image: opencti/connector-crowdstrike:6.0.10 #sitio de paga 
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=aec2c5ba-3383-4341-af94-e137f8317ede
       - CONNECTOR_NAME=CrowdStrike
@@ -476,39 +514,8 @@ services:
     restart: always
     depends_on:
       - opencti
-  connector-crowdstrike:
-    image: opencti/connector-crowdstrike:6.0.10
-    environment:
-      - OPENCTI_URL=http://localhost
-      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=2c12001b-b16b-4e3a-bde7-9dd771cee005
-      - CONNECTOR_NAME=CrowdStrike
-      - CONNECTOR_SCOPE=crowdstrike
-      - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
-      - CONNECTOR_LOG_LEVEL=error
-      - CROWDSTRIKE_BASE_URL=https://api.crowdstrike.com
-      - CROWDSTRIKE_CLIENT_ID=ChangeMe
-      - CROWDSTRIKE_CLIENT_SECRET=ChangeMe
-      - CROWDSTRIKE_TLP=Amber
-      - CROWDSTRIKE_CREATE_OBSERVABLES=true
-      - CROWDSTRIKE_CREATE_INDICATORS=true
-      - CROWDSTRIKE_SCOPES=actor,report,indicator,yara_master
-      - CROWDSTRIKE_ACTOR_START_TIMESTAMP=0
-      - CROWDSTRIKE_REPORT_START_TIMESTAMP=0 # BEWARE! A lot of reports!
-      - CROWDSTRIKE_REPORT_STATUS=New
-      - CROWDSTRIKE_REPORT_INCLUDE_TYPES=notice,tipper,intelligence report,periodic report
-      - CROWDSTRIKE_REPORT_TYPE=threat-report
-      - CROWDSTRIKE_REPORT_GUESS_MALWARE=false # Use report tags to guess malware
-      - CROWDSTRIKE_INDICATOR_START_TIMESTAMP=0 # BEWARE! A lot of indicators!
-      - CROWDSTRIKE_INDICATOR_EXCLUDE_TYPES=hash_ion,hash_md5,hash_sha1
-      - CROWDSTRIKE_INDICATOR_LOW_SCORE=40
-      - CROWDSTRIKE_INDICATOR_LOW_SCORE_LABELS=MaliciousConfidence/Low
-      - CROWDSTRIKE_INTERVAL_SEC=1800
-    restart: always
-    depends_on:
-      - opencti
   connector-cuckoo:
-    image: opencti/connector-cuckoo:6.0.10
+    image: opencti/connector-cuckoo:6.0.10  #revisar conector 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -531,7 +538,7 @@ services:
   connector-cve:
     image: opencti/connector-cve:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=f682f6e2-eb20-4d5d-963a-9634c7752c7b
       - CONNECTOR_NAME=Common Vulnerabilities and Exposures
@@ -540,7 +547,7 @@ services:
       - CONNECTOR_RUN_AND_TERMINATE=false
       - CONNECTOR_LOG_LEVEL=error
       - CVE_BASE_URL=https://services.nvd.nist.gov/rest/json/cves
-      - CVE_API_KEY=ChangeMe # Required
+      - CVE_API_KEY=76b87db0-91b0-44aa-a241-3c8ac6f8b113 # Required
       - CVE_INTERVAL=2 # Required, in hours advice min 2
       - CVE_MAX_DATE_RANGE=120 # In days, max 120
       - CVE_MAINTAIN_DATA=true # Required, retrieve only updated data
@@ -552,7 +559,7 @@ services:
   connector-cyber-campaign-collection:
     image: opencti/connector-cyber-campaign-collection:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=bda9e052-828d-4531-b85d-3f8b276f164b
       - "CONNECTOR_NAME=APT & Cybercriminals Campaign Collection"
@@ -566,9 +573,9 @@ services:
     depends_on:
       - opencti
   connector-cybersixgill:
-    image: opencti/connector-cybersixgill:6.0.10
+    image: opencti/connector-cybersixgill:6.0.10    #Conector de Paga
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080   
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=8dc2d625-344c-4dbd-ada0-f3f965b927b0
       - CONNECTOR_NAME=Cybersixgill Darkfeed
@@ -588,7 +595,7 @@ services:
   connector-diode-import:
     image: opencti/connector-diode-import:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=2fc64c2f-7ccf-45c1-9a9a-4b796f6496a5
       - CONNECTOR_NAME=Diode Import
@@ -603,7 +610,7 @@ services:
   connector-disarm-framework:
     image: opencti/connector-disarm-framework:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=507dff7e-0d4c-463f-ba3a-334157f72725
       - "CONNECTOR_NAME=DISARM Framework"
@@ -617,9 +624,9 @@ services:
     depends_on:
       - opencti
   connector-eset:
-    image: opencti/connector-eset:6.0.10
+    image: opencti/connector-eset:6.0.10  #conector de paga 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=94bf7384-182f-44d1-b2ed-269a82ad4155
       - "CONNECTOR_NAME=ESET Cyber Threat Intelligence"
@@ -640,7 +647,7 @@ services:
   connector-feedly:
     image: opencti/connector-feedly:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=667844f9-203e-4141-9028-8a756258bb70
       - CONNECTOR_NAME=Feedly
@@ -650,14 +657,14 @@ services:
       - FEEDLY_INTERVAL=60 # in minutes
       - FEEDLY_STREAM_IDS= # Comma separated list of stream ids
       - FEEDLY_DAYS_TO_BACK_FILL=7 # Number of days to back fill for new stream ids
-      - FEEDLY_API_KEY=ChangeMe # Feedly API key to generate here https://feedly.com/i/team/api
+      - FEEDLY_API_KEY=fe_0vCvxTFiOi62GtyvLXJFlb9uNyx5xDWdV6LYDUKG # Feedly API key to generate here https://feedly.com/i/team/api
     restart: always
     depends_on:
       - opencti
   connector-flashpoint:
-    image: opencti/connector-flashpoint:6.0.10
+    image: opencti/connector-flashpoint:6.0.10  #conector de paga
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=89ce72b7-d772-4f0f-91df-c8fa887b6e6c
       - CONNECTOR_NAME=Flashpoint
@@ -674,10 +681,178 @@ services:
     restart: always
     depends_on:
       - opencti
-  connector-greynoise-feed:
-    image: opencti/connector-greynoise-feed:6.0.10
+  connector-joe-sandbox:
+    image: opencti/connector-joe-sandbox:6.0.10      #configurar APIKey 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=f7776250-b5b6-473d-aa58-30bdc4621022
+      - "CONNECTOR_NAME=Joe Sandbox"
+      - CONNECTOR_SCOPE=Artifact,Url
+      - CONNECTOR_AUTO=false # Enable/disable auto-enrichment of observables
+      - CONNECTOR_CONFIDENCE_LEVEL=50 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+      # Download/upload as external ref files for these report types
+      # json/xml are only allowed to be used with Joe Sandbox Cloud Pro
+      - JOE_SANDBOX_REPORT_TYPES=executive,html,iochtml,iocjson,iocxml,unpackpe,stix,ida,pdf,pdfexecutive,misp,pcap,maec,memdumps,json,lightjsonfixed,xml,lightxml,pcapunified,pcapsslinspection
+      # Cloud Pro: https://jbxcloud.joesecurity.org/api
+      # Cloud Basic: https://joesandbox.com/api
+      - JOE_SANDBOX_API_URL=https://jbxcloud.joesecurity.org/api
+      - JOE_SANDBOX_API_KEY=ChangeMe
+      # Cloud Pro: https://jbxcloud.joesecurity.org/analysis
+      # Cloud Basic: https://joesandbox.com/analysis
+      - JOE_SANDBOX_ANALYSIS_URL=https://jbxcloud.joesecurity.org/analysis
+      # If true you accept Terms and Conditions at https://jbxcloud.joesecurity.org/tandc
+      - JOE_SANDBOX_ACCEPT_TAC=true
+      # Time in seconds to timeout after calling Joe Sandbox API
+      - JOE_SANDBOX_API_TIMEOUT=30
+      # Verify SSL for API calls
+      - JOE_SANDBOX_VERIFY_SSL=true
+      # How many times to retry API calls before giving up
+      - JOE_SANDBOX_API_RETRIES=5
+      # A JSON encoded map of proxies to use for API calls
+      # See https://requests.readthedocs.io/en/latest/user/advanced/?highlight=proxy#proxies
+      - JOE_SANDBOX_PROXIES=
+      # The user agent. Use this when you write an integration with Joe Sandbox
+      # so that it is possible to track how often an integration is being used.
+      - JOE_SANDBOX_USER_AGENT=OpenCTI
+      # Analysis systems to use (comma separated if multiple)
+      - JOE_SANDBOX_SYSTEMS=w10x64_office
+      # Timeout for the analysis
+      - JOE_SANDBOX_ANALYSIS_TIME=300
+      # Enable full internet access in the analysis (must be false if internet simulation is true)
+      - JOE_SANDBOX_INTERNET_ACCESS=true
+      # Enable internet simulation (must be false if internet access is true)
+      - JOE_SANDBOX_INTERNET_SIMULATION=false
+      # Enable Hybrid Code Analysis (HCA).
+      - JOE_SANDBOX_HYBRID_CODE_ANALYSIS=true
+      # Enable Hybrid Decompilation (DEC).
+      - JOE_SANDBOX_HYBRID_DECOMPILATION=true
+      # Enable the report cache. Check the cache for existing reports before running a full analysis.
+      - JOE_SANDBOX_REPORT_CACHE=false
+      # Perform APK DEX code instrumentation.
+      - JOE_SANDBOX_APK_INSTRUMENTATION=true
+      # Perform generic unpacking using the Microsoft Antimalware Scan Interface (AMSI).# Perform generic unpacking using the Microsoft Antimalware Scan Interface (AMSI).
+      - JOE_SANDBOX_AMSI_UNPACKING=true
+      # Enable HTTPS inspection.
+      - JOE_SANDBOX_SSL_INSPECTION=true
+      # Enable VBA instrumentation (two analyses are performed)
+      - JOE_SANDBOX_VBA_INSTRUMENTATION=false
+      # Enable Javascript instrumentation (two analyses are performed)
+      - JOE_SANDBOX_JS_INSTRUMENTATION=false
+      # Enable JAVA JAR tracing (two analyses are performed)
+      - JOE_SANDBOX_JAVA_JAR_TRACING=false
+      # Enable .NET tracing (two analyses are performed)
+      - JOE_SANDBOX_DOTNET_TRACING=false
+      # Starts the Sample with normal user privileges
+      - JOE_SANDBOX_START_AS_NORMAL_USER=false
+      # Change the analyzer’s system date (helpful for date-aware samples), format is: YYYY-MM-DD
+      - JOE_SANDBOX_SYSTEM_DATE=
+      # Changes the language and locale of the analysis machine
+      - JOE_SANDBOX_LANGUAGE_AND_LOCALE=
+      # Select the country to use for routing internet access through.
+      - JOE_SANDBOX_LOCALIZED_INTERNET_COUNTRY=
+      - JOE_SANDBOX_EMAIL_NOTIFICATION=false
+      # Do not unpack archives (zip, 7z etc) containing multiple files.
+      - JOE_SANDBOX_ARCHIVE_NO_UNPACK=false
+      # Enable Hypervisor based Inspection
+      - JOE_SANDBOX_HYPERVISOR_BASED_INSPECTION=false
+      # Fast Mode focuses on fast analysis and detection versus deep forensic analysis.
+      - JOE_SANDBOX_FAST_MODE=false
+      # Enables secondary results such as Yara rule generation, classification via Joe Sandbox Class as well as several detail reports. Analysis will run faster with disabled secondary results
+      - JOE_SANDBOX_SECONDARY_RESULTS=true
+      # Path to a cookbook to run for the analysis
+      - JOE_SANDBOX_COOKBOOK_FILE_PATH=
+      # Password for decrypting documents like MS Office and PDFs
+      - JOE_SANDBOX_DOCUMENT_PASSWORD=1234
+      # This password will be used to decrypt archives (zip, 7z, rar etc.).
+      - JOE_SANDBOX_ARCHIVE_PASSWORD=infected
+      # Will start the sample with the given command-line argument. Currently only available on Windows analyzers.
+      - JOE_SANDBOX_COMMAND_LINE_ARGUMENT=
+      # Encryption password for analyses, AES-256 is used to encrypt files and the password is deleted on the backend after encrypting files
+      - JOE_SANDBOX_ENCRYPT_WITH_PASSWORD=
+      # Use a browser for analysis of URLs, false == download/execute
+      - JOE_SANDBOX_BROWSER=false
+      # Lookup the reputation of URLs and domains to improve the analysis. This option will send URLs and domains to third party services and WHOIS servers!
+      - JOE_SANDBOX_URL_REPUTATION=false
+      # Export the report(s) from this analysis to Joe Sandbox View.
+      - JOE_SANDBOX_EXPORT_TO_JBXVIEW=false
+      # Delete the analysis after X days. If not set, the default value is used
+      - JOE_SANDBOX_DELETE_AFTER_DAYS=30
+      ## ON PREMISE EXCLUSIVE PARAMETER, set the priority of the submission between 1 and 10, high value means higher priority
+      - JOE_SANDBOX_PRIORITY=
+      # The default TLP for newly created stix objects
+      - JOE_SANDBOX_DEFAULT_TLP=TLP:CLEAR
+      # The color for yara labels applied to the observable
+      - JOE_SANDBOX_YARA_COLOR=#0059f7
+      # The color for default labels
+      - JOE_SANDBOX_DEFAULT_COLOR=#54483b
+    restart: always
+    depends_on:
+      - opencti
+
+  connector-recordedfuture-enrichment:
+    image: opencti/connector-recordedfuture-enrichment:6.0.10
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=7a41dd8a-59ce-47f7-a293-3d3e61ef37f2
+      - CONNECTOR_NAME=Recorded Future Enrichment
+      - CONNECTOR_SCOPE=ipv4-addr,ipv6-addr,domain-name,url,stixfile
+      - CONNECTOR_AUTO=false
+      - CONNECTOR_LOG_LEVEL=error
+      - RECORDED_FUTURE_TOKEN=CHANGEME #required
+      - RECORDED_FUTURE_INFO_MAX_TLP=TLP:AMBER
+      - RECORDED_FUTURE_CREATE_INDICATOR_THRESHOLD=0
+    restart: always
+    depends_on:
+      - opencti
+  connector-hygiene:
+    image: opencti/connector-hygiene:6.0.10
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=ChangeMe
+      - CONNECTOR_ID=a5cd7072-8074-480d-9f89-c6130adf403d
+      - CONNECTOR_NAME=Hygiene
+      - CONNECTOR_SCOPE=IPv4-Addr,IPv6-Addr,Domain-Name,StixFile,Artifact
+      - CONNECTOR_AUTO=true
+      - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+      - HYGIENE_WARNINGLISTS_SLOW_SEARCH=false # Enable warning lists slow search mode
+      - HYGIENE_ENRICH_SUBDOMAINS=false # Enrich subdomains with hygiene_parent label if the parents are found in warninglists
+    restart: always
+    depends_on:
+      - opencti
+  connector-orion-malware:
+    image: opencti/connector-orion-malware:6.0.10   #Sitio de PAga 
+    #add the volume if you want to
+    volumes:
+      - ./path/to/your/local/cert:/path/in/container/cert
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - OPEN_CTI_ORGANISATIONS=ORGANISATION_NAME:ORION_MALWARE_API_KEY,ORGANISATION_NAME_2:ORION_MALWARE_API_KEY_2
+      - CONNECTOR_ID=Orion_Malware
+      - "CONNECTOR_NAME=OrionMalware"
+      - CONNECTOR_SCOPE=StixFile,Artifact,Report
+      - CONNECTOR_AUTO=false
+      - CONNECTOR_LOG_LEVEL=info
+      - CONNECTOR_ADD_LABEL=true
+      - ORION_MALWARE_URL=ChangeMe
+      - ORION_MALWARE_VERIFY_SSL=False #put the /path/in/container/cert if you want no enable verify ssl between Orion and OpenCTI
+      - ORION_MALWARE_API_TIMEOUT=120
+      - ORION_MALWARE_DEFAULT_TLP=TLP:CLEAR
+      - ORION_MALWARE_TLP_RED_VISIBILITY=private
+      - ORION_MALWARE_TLP_AMBER_AND_AMBER_STRICT_VISIBILITY=group
+      - ORION_MALWARE_TLP_CLEAR_AND_GREEN_VISIBILITY=public
+      - ORION_MALWARE_DEFAULT_API_KEY=ChangeMe
+    restart: always
+    depends_on:
+      - opencti
+  connector-greynoise-feed:
+    image: opencti/connector-greynoise-feed:6.0.10   #confirmar API
+    environment:
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=073588f8-c527-4f7e-8067-a15772cf6a7f
       - CONNECTOR_TYPE=EXTERNAL_IMPORT
@@ -685,7 +860,7 @@ services:
       - CONNECTOR_SCOPE=greynoisefeed
       - CONNECTOR_CONFIDENCE_LEVEL=80 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=info
-      - GREYNOISE_API_KEY=ChangeMe
+      - GREYNOISE_API_KEY=gsGOmcjoAN8iBTG4pVGqRyLegTHtSVT4Ww6ru95Bm6aWAPUIRMoqRSc3xaDh4jMT
       - GREYNOISE_SOURCE="feed"
       - GREYNOISE_FEED_TYPE="benign"
       - GREYNOISE_TAG_SLUGS="tag-slug-1,tag-slug-2"
@@ -719,9 +894,9 @@ services:
     depends_on:
       - opencti
   connector-ironnet:
-    image: opencti/connector-ironnet:6.0.10
+    image: opencti/connector-ironnet:6.0.10 #conector de paga 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=cfd1e469-b16f-41c6-a748-07cc1ac6242b
       - "CONNECTOR_NAME=IronNet threat intel"
@@ -735,13 +910,10 @@ services:
     restart: always
     depends_on:
       - opencti   
-      
-      
-    #Pendiente el conector de Kaspersky-------------------------------------------------------------------KAspersky aqui
   connector-lastinfosec:
-    image: opencti/connector-lastinfosec:6.0.10
+    image: opencti/connector-lastinfosec:6.0.10    #conecto de paga 
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=dd7a524b-7032-4729-93af-517e6e43ab90
       - CONNECTOR_NAME=lastinfosec-CTI
@@ -758,9 +930,9 @@ services:
     depends_on:
       - opencti
   connector-malcore:
-    image: opencti/connector-malcore:6.0.10
+    image: opencti/connector-malcore:6.0.10   #conector de paga 
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=f6dd6181-1080-466a-b342-35efa3849f86
       - CONNECTOR_NAME=Malcore
@@ -775,9 +947,9 @@ services:
     depends_on:
       - opencti
   connector-malpedia:
-    image: opencti/connector-malpedia:6.0.10
+    image: opencti/connector-malpedia:6.0.10    # no necesita API 
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=950a7a14-42cc-4ac6-846d-9a64503a94e7
       - CONNECTOR_NAME=Malpedia
@@ -796,15 +968,15 @@ services:
   connector-maltiverse:
     image: opencti/connector-maltiverse:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=10476c1b-0b8e-4b59-b82a-ca4086b01fd6
       - CONNECTOR_NAME=MALTIVERSE
       - CONNECTOR_SCOPE=ipv4-addr,ipv6-addr,vulnerability,domain,url,file-sha256,file-md5,file-sha1 # MIME type or Stix Object
       - CONNECTOR_CONFIDENCE_LEVEL=50 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=error
-      - MALTIVERSE_USER=change@me.com # Username from Maltiverse
-      - MALTIVERSE_PASSWD=ChAnGeMe! # PAssword for the user provided
+      - MALTIVERSE_USER=ciberscm@cscm.com.mx # Username from Maltiverse
+      - MALTIVERSE_PASSWD=Ciber_scm00 # PAssword for the user provided
       - MALTIVERSE_FEEDS=VdhZV34B4jHUXfKt_gDi # Your feeds selection between commas
       - MALTIVERSE_POLL_INTERVAL=4 # in hours!
     restart: always      
@@ -831,7 +1003,7 @@ services:
   connector-mandiant:
     image: opencti/connector-mandiant:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=e74a8a35-7ad6-40e7-9e99-283e618dcb6a
       - CONNECTOR_NAME=Mandiant
@@ -846,7 +1018,7 @@ services:
   connector-misp-feed:
     image: opencti/connector-misp-feed:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=65454e93-8dc8-4f50-8756-1214f7460078
       - "CONNECTOR_NAME=MISP Feed"
@@ -877,7 +1049,7 @@ services:
   connector-misp:
     image: opencti/connector-misp:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=48edf2c6-3573-4c4f-8750-9673b14312e2
       - CONNECTOR_NAME=MISP
@@ -885,7 +1057,7 @@ services:
       - CONNECTOR_CONFIDENCE_LEVEL=25 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=error
       - CONNECTOR_EXPOSE_METRICS=false
-      - MISP_URL=http://localhost # Required
+      - MISP_URL=http://opencti:8080 # Required
       - MISP_REFERENCE_URL= # Optional, will be used to create external reference to MISP event (default is "url")
       - MISP_KEY=ChangeMe # Required
       - MISP_SSL_VERIFY=false # Required
@@ -923,7 +1095,7 @@ services:
   connector-mitre-atlas:
     image: opencti/connector-mitre-atlas:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=44aeef7c-fbba-4c93-a5ed-c4bc9594cb1b
       - "CONNECTOR_NAME=MITRE ATLAS"
@@ -933,23 +1105,6 @@ services:
       - CONNECTOR_LOG_LEVEL=error
       - MITRE_ATLAS_URL=https://raw.githubusercontent.com/mitre-atlas/atlas-navigator-data/main/dist/stix-atlas.json
       - MITRE_ATLAS_INTERVAL=7 # In days, must be strictly greater than 1
-    restart: always
-    depends_on:
-      - opencti
-  connector-mitre:
-    image: opencti/connector-mitre:6.0.10
-    environment:
-      - OPENCTI_URL=http://localhost
-      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=ddcc2d07-62f3-4664-9816-447d62ada3ef
-      - "CONNECTOR_NAME=MITRE Datasets"
-      - CONNECTOR_SCOPE=tool,report,malware,identity,campaign,intrusion-set,attack-pattern,course-of-action,x-mitre-data-source,x-mitre-data-component,x-mitre-matrix,x-mitre-tactic,x-mitre-collection
-      - CONNECTOR_CONFIDENCE_LEVEL=75
-      - CONNECTOR_UPDATE_EXISTING_DATA=false
-      - CONNECTOR_RUN_AND_TERMINATE=false
-      - CONNECTOR_LOG_LEVEL=error
-      - MITRE_REMOVE_STATEMENT_MARKING=true
-      - MITRE_INTERVAL=7 # In days
     restart: always
     depends_on:
       - opencti
@@ -980,7 +1135,7 @@ services:
     depends_on:
       - opencti
   connector-taxii2:
-    image: opencti/connector-obstracts:6.0.10
+    image: opencti/connector-obstracts:6.0.10    #gratuita pero en mantenimiento 24/04/2024
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1003,7 +1158,7 @@ services:
   connector-opencsam:
     image: opencti/connector-opencsam:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=9573f4d3-f198-4499-9bf3-8301ef67e3db
       - "CONNECTOR_NAME=OpenCSAM"
@@ -1024,7 +1179,7 @@ services:
   connector-opencti:
     image: opencti/connector-opencti:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=641d79da-d491-4bac-ad20-c1dac5dc8287
       - "CONNECTOR_NAME=OpenCTI Datasets"
@@ -1042,9 +1197,9 @@ services:
     depends_on:
       - opencti
   connector-orange-cyberdefense:
-    image: opencti/connector-orange-cyberdefense:6.0.10
+    image: opencti/connector-orange-cyberdefense:6.0.10    #sitio de paga 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=6a3a8521-1885-4fe6-b864-b183917e9085
       - "CONNECTOR_NAME=Orange Cyberdefense Cyber Threat Intelligence"
@@ -1073,7 +1228,7 @@ services:
     depends_on:
       - opencti
   connector-phishunt:
-    image: opencti/connector-phishunt:6.0.10
+    image: opencti/connector-phishunt:6.0.10   #sitio de paga 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1107,14 +1262,10 @@ services:
       - CONNECTOR_RUN_EVERY=300s # In seconds.
       # Connector's custom execution parameters: 
     restart: always
-  networks:
-  default:
-    name: open_cti_docker_default
-    external: true
     depends_on:
       - opencti
   connector-recorded-future:
-    image: opencti/connector-recorded-future:6.0.10
+    image: opencti/connector-recorded-future:6.0.10   #Sitio de paga 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1146,7 +1297,7 @@ services:
   connector-restore-files:
     image: opencti/connector-restore-files:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost # Local OpenCTI URL
+      - OPENCTI_URL=http://opencti:8080 # Local OpenCTI URL
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN} # Local OpenCTI token
       - CONNECTOR_ID=4a8282b8-884b-4fad-8f18-49590b85e498
       - CONNECTOR_NAME=RestoreFiles
@@ -1159,9 +1310,9 @@ services:
     depends_on:
       - opencti
   connector-riskiq:
-    image: opencti/connector-riskiq:6.0.10
+    image: opencti/connector-riskiq:6.0.10   #identificar conector muestra  con cuenta de microsoft pero no da APi 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=f94ee2b4-eb4a-4d41-8b1a-642932d417fd
       - CONNECTOR_NAME=RISKIQ
@@ -1170,15 +1321,15 @@ services:
       - CONNECTOR_LOG_LEVEL=error
       - CONNECTOR_EXPOSE_METRICS=false
       - RISKIQ_BASE_URL=https://api.riskiq.net/pt/v2
-      - RISKIQ_USER=ChangeMe
-      - RISKIQ_PASSWORD=ChangeMe
+      - RISKIQ_USER=yesker08@outlook.es 
+      - RISKIQ_PASSWORD=Yskr_0893
       - RISKIQ_CREATE_OBSERVABLES=true
       - RISKIQ_INTERVAL_SEC=86400
     restart: always
     depends_on:
       - opencti
   connector-rst-report-hub:
-    image: opencti/connector-rst-report-hub:6.0.10
+    image: opencti/connector-rst-report-hub:6.0.10   #cuenta de paga 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1199,7 +1350,7 @@ services:
     depends_on:
       - opencti
   connector-rst-threat-feed:
-    image: opencti/connector-rst-threat-feed:6.0.10
+    image: opencti/connector-rst-threat-feed:6.0.10     #cuenta de paga 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1225,9 +1376,9 @@ services:
     depends_on:
       - opencti
   connector-sekoia:
-    image: opencti/connector-sekoia:6.0.10
+    image: opencti/connector-sekoia:6.0.10  # sitio de paga 
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=9c7b178a-0141-4baa-8986-67a2c012e57a
       - CONNECTOR_NAME=SEKOIA.IO
@@ -1241,7 +1392,7 @@ services:
     depends_on:
       - opencti
   connector-sentinelone-threats:
-    image: opencti/connector-sentinelone-threats:6.0.10
+    image: opencti/connector-sentinelone-threats:6.0.10 #Sitio de paga 
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1267,31 +1418,11 @@ services:
     restart: always
     depends_on:
       - opencti
-  connector-taxii2:
-    image: opencti/connector-siemrules:6.0.10
-    environment:
-      - OPENCTI_URL=http://opencti:8080
-      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=5dcb9f57-dcbb-4e8f-b52e-dd2de1810afd
-      - CONNECTOR_NAME=SIEMRULES
-      - CONNECTOR_SCOPE=identity,report,indicator
-      - CONNECTOR_CONFIDENCE_LEVEL=70
-      - CONNECTOR_LOG_LEVEL=error
-      - TAXII2_DISCOVERY_URL=https://app.siemrules.com/taxii/taxii2
-      - TAXII2_USERNAME=CHANGEME
-      - TAXII2_PASSWORD=CHANGEME
-      - TAXII2_V21=true
-      - TAXII2_COLLECTIONS=CHANGEME
-      - TAXII2_INITIAL_HISTORY=24
-      - TAXII2_INTERVAL=24
-      - VERIFY_SSL=true
-    restart: always
-    depends_on:
-      - opencti
+ 
   connector-silobreaker:
     image: opencti/connector-silobreaker:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=56d59c86-cec9-4f27-9f94-41c6d8159f6a
       - "CONNECTOR_NAME=Silobreaker Cyber Threat Intelligence"
@@ -1307,9 +1438,9 @@ services:
     depends_on:
       - opencti
   connector-socprime:
-    image: opencti/connector-socprime:6.0.10
+    image: opencti/connector-socprime:6.0.10 # sitio de paga 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=6247b723-9bfb-45c7-9953-14120c17707c
       - CONNECTOR_NAME=SOC Prime
@@ -1321,27 +1452,6 @@ services:
       # - SOCPRIME_JOB_IDS=ChangeMe
       - SOCPRIME_INTERVAL_SEC=3600
       - SOCPRIME_SIEM_TYPE=
-    restart: always
-    depends_on:
-      - opencti
-  connector-taxii2:
-    image: opencti/connector-stixify:6.0.10
-    environment:
-      - OPENCTI_URL=http://opencti:8080
-      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=b091554c-33de-49a8-912a-61fea94d45e1
-      - CONNECTOR_NAME=STIXIFY
-      - CONNECTOR_SCOPE=identity,attack-pattern,course-of-action,intrusion-set,malware,tool,report,vulnerability,campaign,incident,indicator,infrastructure,location,note,threat-actor,tool,software
-      - CONNECTOR_CONFIDENCE_LEVEL=70
-      - CONNECTOR_LOG_LEVEL=error
-      - TAXII2_DISCOVERY_URL=https://app.stixify.com/taxii/taxii2
-      - TAXII2_USERNAME=CHANGEME
-      - TAXII2_PASSWORD=CHANGEME
-      - TAXII2_V21=true
-      - TAXII2_COLLECTIONS=CHANGEME
-      - TAXII2_INITIAL_HISTORY=24
-      - TAXII2_INTERVAL=24
-      - VERIFY_SSL=true
     restart: always
     depends_on:
       - opencti
@@ -1361,49 +1471,19 @@ services:
     restart: always
     depends_on:
       - opencti
-  connector-taxii2:
-    image: opencti/connector-taxii2:6.0.10
+  connector-thehive:
+    image: opencti/connector-thehive:6.0.10   #revisar Api
     environment:
       - OPENCTI_URL=http://opencti:8080
-      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=1313de59-a6e3-4f6f-869a-50d388199b83
-      - CONNECTOR_NAME=TAXII2
-      - CONNECTOR_SCOPE=ipv4-addr,ipv6-addr,vulnerability,domain,url,file-sha256,file-md5,file-sha1
-      - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
-      - CONNECTOR_LOG_LEVEL=error
-      - TAXII2_DISCOVERY_URL=ChangeMe # Required
-      - TAXII2_CERT_PATH=ChangeMe # Optional (.pem)
-      - TAXII2_USERNAME=ChangeMe # Required
-      - TAXII2_PASSWORD=ChangeMe
-      - TAXII2_USE_TOKEN=false
-      - TAXII2_TOKEN=ChangeMe # change TAXII2_USE_TOKEN to true to use this
-      - TAXII2_V21=true # Is TAXII v2.1
-      - TAXII2_COLLECTIONS=*.* # Required
-      - TAXII2_INITIAL_HISTORY= 24 # Required, in hours
-      - TAXII2_INTERVAL=100 # Required, in hours
-      - TAXII2_VERIFY_SSL=true
-      - TAXII2_CREATE_INDICATORS=true # Generate indicators for ingested observables
-      - TAXII2_CREATE_OBSERVABLES=true # Generate observables for ingested indicators
-      - TAXII2_ADD_CUSTOM_LABEL=false # Enable custom label
-      - TAXII2_CUSTOM_LABEL= # Custom label added to all objects
-      - TAXII2_FORCE_PATTERN_AS_NAME=false
-      - "TAXII2_FORCE_MULTIPLE_PATTERN_NAME=Multiple Indicators"
-    restart: always
-    depends_on:
-      - opencti
-  connector-thehive:
-    image: opencti/connector-thehive:6.0.10
-    environment:
-      - OPENCTI_URL=http://localhost
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=f931de66-e4f0-4fa8-b778-d5859f3cc7d8
       - CONNECTOR_NAME=TheHive
       - CONNECTOR_SCOPE=thehive
       - CONNECTOR_LOG_LEVEL=error
       - THEHIVE_URL=https://thehive.changeme.com
-      - THEHIVE_API_KEY=ChangeMe
+      - THEHIVE_API_KEY=siyTdikPi)3vmnR2308dhVNowFIUEcgI
       - THEHIVE_CHECK_SSL=true
-      - THEHIVE_ORGANIZATION_NAME=MyCompany
+      - THEHIVE_ORGANIZATION_NAME=OPenSecure
       - THEHIVE_IMPORT_FROM_DATE=2021-01-01T00:00:00 # Optional
       - THEHIVE_IMPORT_ONLY_TLP=0,1,2,3,4
       - THEHIVE_IMPORT_ALERTS=true
@@ -1435,9 +1515,9 @@ services:
     depends_on:
       - openct
   connector-threatmatch:
-    image: opencti/connector-threatmatch:6.0.10
+    image: opencti/connector-threatmatch:6.0.10  # sitio de paga 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=d6a15abf-0adb-4e41-9faa-6538b22428bc
       - CONNECTOR_NAME=ThreatMatch
@@ -1458,7 +1538,7 @@ services:
   connector-tweetfeed:
     image: opencti/connector-tweetfeed:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=e55878fc-f072-41a0-a2c0-dc00f48dc4d4-
       - CONNECTOR_NAME=Tweetfeed
@@ -1501,7 +1581,7 @@ services:
   connector-urlhaus:
     image: opencti/connector-urlhaus:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=4c18df7c-7880-4303-8588-f9bbcb417610
       - "CONNECTOR_NAME=Abuse.ch URLhaus"
@@ -1515,10 +1595,47 @@ services:
     restart: always
     depends_on:
       - opencti
-  connector-urlscan:
-    image: opencti/connector-urlscan:6.0.10
+  connector-yara:
+    image: opencti/connector-yara:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost:8080
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=ChangeMe
+      - CONNECTOR_ID=ChangeMe
+      - CONNECTOR_NAME=YARA
+      - CONNECTOR_SCOPE=Artifact # MIME type or Stix Object
+      - CONNECTOR_AUTO=true
+      - CONNECTOR_CONFIDENCE_LEVEL=100 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+    restart: always
+    depends_on:
+      - opencti
+  connector-vmray-analyzer:
+    image: opencti/connector-vmray-analyzer:6.0.10  #paga 
+    environment:
+      - OPENCTI_URL=ChangeMe
+      - OPENCTI_TOKEN=ChangeMe
+      - CONNECTOR_ID=VMRay_Analyzer
+      - "CONNECTOR_NAME=VMRay Analyzer"
+      - CONNECTOR_SCOPE=Artifact
+      - CONNECTOR_AUTO=false # Enable/disable auto-enrichment of observables
+      - CONNECTOR_CONFIDENCE_LEVEL=50 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+      - VMRAY_ANALYZER_SERVER=https://us.cloud.vmray.com
+      - VMRAY_ANALYZER_API_KEY=ChangeMe
+      - VMRAY_ANALYZER_SHAREABLE=false # Sample can be shared with public/VirusTotal
+      - VMRAY_ANALYZER_REANALYZE=true # Reanalyze sample if analyses already exist
+      - VMRAY_ANALYZER_DEFAULT_COLOR=#54483b # Default label color
+      - VMRAY_ANALYZER_CLASSIFICATIONS_COLOR=#54483b # Label color for classifications
+      - VMRAY_ANALYZER_THREAT_NAMES_COLOR=#0059f7 # Label color for threat namess
+      - VMRAY_ANALYZER_DEFAULT_TLP=TLP:CLEAR
+      - VMRAY_ANALYZER_MAX_TLP=TLP:AMBER
+    restart: always
+    depends_on:
+      - opencti
+  connector-urlscan:
+    image: opencti/connector-urlscan:6.0.10     #no se recibio correo /ya se agrego API
+    environment:
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=73a75ca2-7c1c-4e42-a2a6-74c8edc2cc23
       - CONNECTOR_NAME=Urlscan
@@ -1530,14 +1647,14 @@ services:
       - CONNECTOR_LABELS=Phishing,Phishfeed
       - CONNECTOR_INTERVAL=86400 # seconds, 1d
       - URLSCAN_URL=https://urlscan.io/api/v1/pro/phishfeed?format=json&q=date:>now-1d
-      - URLSCAN_API_KEY=
+      - URLSCAN_API_KEY= c9f3f2c2-0330-401e-8a69-5563178dc781
     restart: always
     depends_on:
       - opencti
   connector-valhalla:
-    image: opencti/connector-valhalla:6.0.10
+    image: opencti/connector-valhalla:6.0.10  # sitio de   paga pero propciona informacion 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=30b06186-e95d-429e-a039-71c0f7dc6211
       - CONNECTOR_NAME=Valhalla
@@ -1548,8 +1665,74 @@ services:
     restart: always 
     depends_on:
       - opencti
+  connector-shodan:
+    image: opencti/connector-shodan:6.0.10     
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=9c09d5ca-c263-4363-a19e-8795208473c6
+      - CONNECTOR_NAME=Shodan
+      - CONNECTOR_SCOPE=IPv4-Addr
+      - CONNECTOR_AUTO=true
+      - CONNECTOR_LOG_LEVEL=error
+      - SHODAN_TOKEN=cq7QflSVUyQtqow2CNq16deacsdYXOC8
+      - SHODAN_MAX_TLP=TLP:AMBER
+      - SHODAN_CREATE_INDICATORS=true
+      - SHODAN_DEFAULT_SCORE=50
+    restart: always
+    depends_on:
+      - opencti
+  connector-shodan-internetdb:
+    image: opencti/connector-shodan-internetdb:6.0.10
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=2419dcd1-8c45-4ea0-802a-27d5406029c4
+      - CONNECTOR_NAME=Shodan InternetDB
+      - CONNECTOR_SCOPE=IPv4-Addr
+      - CONNECTOR_CONFIDENCE_LEVEL=75
+      - CONNECTOR_AUTO=true
+      - CONNECTOR_LOG_LEVEL=error
+      - SHODAN_MAX_TLP=white
+      - SHODAN_SSL_VERIFY=true
+    restart: always    
+    depends_on:
+      - opencti
+  connector-dnstwist:
+    image: opencti/connector-dnstwist:6.0.10
+    environment:
+      - CONNECTOR_NAME=DNS_TWISTER
+      - CONNECTOR_SCOPE=Domain-Name
+      # Connector's generic execution parameters:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=e3d667e8-8442-4587-9830-9d97c838633c
+      - CONNECTOR_CONFIDENCE_LEVEL=100 # From 0 (Unknown) to 100 (Fully trusted).
+      - CONNECTOR_LOG_LEVEL=info
+      - CONNECTOR_AUTO=false # don't run the connector automatically, you will flood your opencti instance
+      - CONNECTOR_FETCH_REGISTERED=true # takes true or false; gives the ability to control the dnstwister domain selection
+      - CONNECTOR_DNS_TWIST_THREADS=80 #number of threads to use for dnstwist; default is 20
+      - CONNECTOR_UPDATE_EXISTING_DATA=true
+      # Connector's custom execution parameters:
+    restart: always
+    depends_on:
+      - opencti
+  connector-google-dns:
+    image: opencti/connector-google-dns:6.0.10
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=0b7ab04f-0f77-4ea6-8854-bd9b3649bb20 
+      - CONNECTOR_NAME=Google DNS
+      - CONNECTOR_SCOPE=Domain-Name,Hostname # MIME type or Stix Object
+      - CONNECTOR_AUTO=false
+      - CONNECTOR_CONFIDENCE_LEVEL=100 # From 0 (Unknown) to 100 (Fully trusted)
+      - CONNECTOR_LOG_LEVEL=error
+    restart: always
+    depends_on:
+      - opencti
   connector-virustotal-livehunt-notifications:
-    image: opencti/connector-virustotal-livehunt-notifications:6.0.10
+    image: opencti/connector-virustotal-livehunt-notifications:6.0.10   #Api agregada
     environment:
       - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
@@ -1558,7 +1741,7 @@ services:
       - CONNECTOR_SCOPE=StixFile,Indicator,Incident
       - CONNECTOR_CONFIDENCE_LEVEL=50 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=error
-      - VIRUSTOTAL_LIVEHUNT_NOTIFICATIONS_API_KEY=ChangeMe # Private API Key
+      - VIRUSTOTAL_LIVEHUNT_NOTIFICATIONS_API_KEY=f2db69e04436abafb7c09170cdc63c20c69a2b0fb2deca075d3fc8c937b2c494 # Private API Key
       - VIRUSTOTAL_LIVEHUNT_NOTIFICATIONS_INTERVAL_SEC=300 # Time to wait in seconds between subsequent requests
       - VIRUSTOTAL_LIVEHUNT_NOTIFICATIONS_CREATE_ALERT=True # Set to true to create alerts
       - VIRUSTOTAL_LIVEHUNT_NOTIFICATIONS_EXTENSIONS='exe,dll' # (Optional) Comma separated filter to only download files matching these extensions
@@ -1574,31 +1757,10 @@ services:
     restart: always
     depends_on:
       - opencti
-  connector-taxii2:
-    image: opencti/connector-vulmatch:6.0.10
-    environment:
-      - OPENCTI_URL=http://opencti:8080
-      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=3e76a47e-12f9-469e-a302-8f81b190f13d
-      - CONNECTOR_NAME=VULMATCH
-      - CONNECTOR_SCOPE=identity,attack-pattern,course-of-action,intrusion-set,malware,tool,report,vulnerability,campaign,incident,indicator,infrastructure,location,note,threat-actor,tool,software
-      - CONNECTOR_CONFIDENCE_LEVEL=70
-      - CONNECTOR_LOG_LEVEL=error
-      - TAXII2_DISCOVERY_URL=https://app.vulmatch.com/taxii/taxii2
-      - TAXII2_USERNAME=CHANGEME
-      - TAXII2_PASSWORD=CHANGEME
-      - TAXII2_V21=true
-      - TAXII2_COLLECTIONS=CHANGEME
-      - TAXII2_INITIAL_HISTORY=24
-      - TAXII2_INTERVAL=24
-      - VERIFY_SSL=true
-    restart: always
-    depends_on:
-      - opencti
   connector-vxvault:
     image: opencti/connector-vxvault:6.0.10
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=2e1d11ee-2cf4-4c45-9dc0-a29a08bbdb59
       - "CONNECTOR_NAME=VX Vault URL list"
@@ -1613,9 +1775,9 @@ services:
     depends_on:
       - opencti
   connector-zerofox:
-    image: opencti/connector-zerofox:6.0.10
+    image: opencti/connector-zerofox:6.0.10   #sitio de paga 
     environment:
-      - OPENCTI_URL=http://localhost
+      - OPENCTI_URL=http://opencti:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=bbf1b2b5-dc88-45b4-8dd1-e9c56284f0e1
       - CONNECTOR_NAME=Zerofox
@@ -1624,6 +1786,9 @@ services:
       - CONNECTOR_LOG_LEVEL=error
       - ZEROFOX_USERNAME=changeme
       - ZEROFOX_PASSWORD=changeme
+    deploy:  
+      mode: replicated
+      replicas: 1
     restart: always
     depends_on:
       - opencti
